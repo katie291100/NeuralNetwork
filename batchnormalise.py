@@ -9,49 +9,59 @@ class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
 
-        self.conv1 = nn.Conv2d(3, 32, 3, 1)
-        self.conv2 = nn.Conv2d(32, 128, 3, 1, padding=2)
-        self.conv3 = nn.Conv2d(128, 128, 3, 1, padding=2)
-        self.conv4 = nn.Conv2d(128, 128, 3, 1, padding=1)
-        self.conv5 = nn.Conv2d(128, 512, 3, 1, padding=1)
-        self.conv6 = nn.Conv2d(512, 1024, 3, 1)
-        self.conv7 = nn.Conv2d(1024, 1024, 3, 1)
+        self.conv1 = nn.Conv2d(3, 128, 3, 1)
+        self.conv2 = nn.Conv2d(128, 256, 3, 1, padding=2)
+        self.conv3 = nn.Conv2d(256, 256, 3, 1, padding=2)
+        self.conv4 = nn.Conv2d(256, 512, 3, 1, padding=1)
+        self.conv5 = nn.Conv2d(512, 512, 3, 1, padding=1)
+        self.conv6 = nn.Conv2d(512, 512, 3, 1)
+     #   self.conv7 = nn.Conv2d(1024, 1024, 3, 1)
 
         self.maxPool = nn.MaxPool2d(2, 2)
 
-        self.drop1 = nn.Dropout(0.3)
-        self.drop2 = nn.Dropout(0.3)
-        self.drop3 = nn.Dropout(0.2)
-        self.drop4 = nn.Dropout(0.4)
+        self.drop1 = nn.Dropout(0.4)
+        self.drop2 = nn.Dropout(0.5)
+        self.drop3 = nn.Dropout(0.65)
+        self.drop4 = nn.Dropout(0.65)
+        self.drop5 = nn.Dropout(0.75)
 
-        self.fc1 = nn.Linear(1024, 512)
-        self.fc2 = nn.Linear(512, 512)
-        self.fc3 = nn.Linear(512, 10)
+
+        self.fc1 = nn.Linear(4608, 2304)
+        self.fc2 = nn.Linear(2304, 576)
+        self.fc3 = nn.Linear(576, 10)
 
     def forward(self, x):
         i = 0
         f = lambda i: [i + 1, print(i, x.shape)][0]  # i = f(i) will print the shape of x
 
         x = nn.functional.rrelu(self.conv1(x))
-        x = self.drop1(x)
-        x = self.maxPool(x)
+
         x = nn.functional.rrelu(self.conv2(x))
-        x = self.drop2(x)
         x = self.maxPool(x)
+        x = self.drop1(x)
+
         x = nn.functional.rrelu(self.conv3(x))
+
         x = nn.functional.rrelu(self.conv4(x))
-        x = self.drop3(x)
         x = self.maxPool(x)
+        x = self.drop2(x)
         x = nn.functional.rrelu(self.conv5(x))
+
         x = nn.functional.rrelu(self.conv6(x))
-        x = self.drop4(x)
-        x = nn.functional.rrelu(self.conv7(x))
+        x = self.maxPool(x)
+        x = self.drop3(x)
+
+       # x = nn.functional.rrelu(self.conv7(x))
         # i=f(i)-*-
         # i=f(i)
         x=x.reshape(x.shape[0], -1)
-       # print(x.shape)
+
         x = nn.functional.rrelu(self.fc1(x))
+        x = self.drop4(x)
+
         x = nn.functional.rrelu(self.fc2(x))
+        x = self.drop5(x)
+
         x = self.fc3(x)
         # i=f(i)
         return x
@@ -92,10 +102,12 @@ if __name__ == "__main__":
 
     train_transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.RandomHorizontalFlip(),
-                                    torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.1,
-                                                                             hue=0.1),
+                                    transforms.RandomAffine(degrees=15, translate=(0.1, 0.1)),
+                                          # torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.1,
+                                                                    #         hue=0.1),
                                     transforms.Normalize((0.5, 0.5, 0.5),
-                                                         (0.5, 0.5, 0.5))])
+                                                         (0.5, 0.5, 0.5))
+                                          ])
 
     test_transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5),
@@ -155,7 +167,7 @@ if __name__ == "__main__":
         print("Epoch", epoch + 1, "complete")
         print("Loss was", epoch_loss / len(train_loader))
         print()
-        if test_per_epoch:
+        if epoch %5 == 0:
             test()
 
         if train_for_time and time.time() - start >= train_for_time * 60:

@@ -28,7 +28,7 @@ class CNN(nn.Module):
         self.drop1 = nn.Dropout(0.3)
         self.drop2 = nn.Dropout(0.4)
 
-        self.fc1 = nn.Linear(36864, 8192)
+        self.fc1 = nn.Linear(4096, 8192)
         self.fc2 = nn.Linear(8192, 4096)
         self.fc3 = nn.Linear(4096, 10)
 
@@ -57,7 +57,9 @@ class CNN(nn.Module):
         x = self.maxPool(x)
 
         x = x.reshape(x.shape[0], -1)
+
         # i=f(i)
+       # print(x.shape)
         x = nn.functional.rrelu(self.fc1(x))
         x = nn.functional.rrelu(self.fc2(x))
         x = self.fc3(x)
@@ -103,15 +105,23 @@ if __name__ == "__main__":
         transforms.ToTensor(),
         transforms.Normalize((0.4915, 0.4823, .4468), (0.2470, 0.2435, 0.2616))
     ])
+    transformtrain = transforms.Compose([transforms.Resize((32,32)),  #resises the image so it can be perfect for our model.
+                                      transforms.RandomHorizontalFlip(), # FLips the image w.r.t horizontal axis
+                                      transforms.RandomRotation(10),     #Rotates the image to a specified angel
+                                      transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
+                                      transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
+                                      transforms.ToTensor(), # comvert the image to tensor so that it can work with torch
+                                      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) #Normalize all the images
+                               ])
 
     # get training/test data from CIFAR10 dataset
     train_data = torchvision.datasets.CIFAR10(root = "./dataset",
                                               train = True,
-                                              transform = transform,
+                                              transform = transformtrain,
                                               download = True)
     test_data = torchvision.datasets.CIFAR10(root = "./dataset",
                                              train = False,
-                                             transform = transform,
+                                             transform = transformtrain,
                                              download = True)
     train_loader = torch.utils.data.DataLoader(dataset = train_data,
                                                batch_size = batch_size,

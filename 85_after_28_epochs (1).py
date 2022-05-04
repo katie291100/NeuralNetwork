@@ -16,17 +16,14 @@ class CNN(nn.Module):
     super(CNN, self).__init__()
 
     self.conv1 = nn.Conv2d(3, 128, 3, 1)
-    self.bn1 = nn.BatchNorm2d(128)
 
     self.conv2 = nn.Conv2d(128, 256, 3, 1)
-    self.bn2 = nn.BatchNorm2d(256)
 
     self.conv3 = nn.Conv2d(256, 256, 3, 1, padding="same")
-    self.bn3 = nn.BatchNorm2d(100)
 
     self.conv4 = nn.Conv2d(256, 512, 3, 1)
     self.conv5 = nn.Conv2d(512, 512, 3, 1, padding="same")
-    self.conv6 = nn.Conv2d(512, 512, 3, 1)
+    self.conv6 = nn.Conv2d(512, 1024, 3, 1)
 
     self.maxPool = nn.MaxPool2d(2)
 
@@ -34,9 +31,9 @@ class CNN(nn.Module):
     self.drop2 = nn.Dropout(0.4)
     self.drop3 = nn.Dropout(0.5)
     self.drop4 = nn.Dropout(0.6)
-    self.drop5 = nn.Dropout(0.7)
+    self.drop4 = nn.Dropout(0.7)
 
-    self.fc1 = nn.Linear(18432, 8192)
+    self.fc1 = nn.Linear(36864, 8192)
     self.fc2 = nn.Linear(8192, 8192)
     self.fc3 = nn.Linear(8192, 10)
 
@@ -67,10 +64,10 @@ class CNN(nn.Module):
     x = self.drop4(x)
     x = nn.functional.rrelu(self.conv6(x))
     x = self.maxPool(x)
-    x = self.drop5(x)
 
     x = x.reshape(x.shape[0], -1)
     #i=f(i)
+
     x = nn.functional.rrelu(self.fc1(x))
 
     x = nn.functional.rrelu(self.fc2(x))

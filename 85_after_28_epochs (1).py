@@ -11,69 +11,58 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
+
 class CNN(nn.Module):
-  def __init__(self):
-    super(CNN, self).__init__()
+    def __init__(self):
+        super(CNN, self).__init__()
 
-    self.conv1 = nn.Conv2d(3, 128, 3, 1)
+        self.conv1 = nn.Conv2d(3, 128, 3, 1)
+        self.conv2 = nn.Conv2d(128, 256, 3, 1)
+        self.conv3 = nn.Conv2d(256, 256, 3, 1, padding="same")
+        self.conv4 = nn.Conv2d(256, 512, 3, 1)
+        self.conv5 = nn.Conv2d(512, 512, 3, 1, padding="same")
+        self.conv6 = nn.Conv2d(512, 1024, 3, 1)
 
-    self.conv2 = nn.Conv2d(128, 256, 3, 1)
+        self.maxPool = nn.MaxPool2d(2)
 
-    self.conv3 = nn.Conv2d(256, 256, 3, 1, padding="same")
+        self.drop1 = nn.Dropout(0.3)
+        self.drop2 = nn.Dropout(0.4)
 
-    self.conv4 = nn.Conv2d(256, 512, 3, 1)
-    self.conv5 = nn.Conv2d(512, 512, 3, 1, padding="same")
-    self.conv6 = nn.Conv2d(512, 1024, 3, 1)
+        self.fc1 = nn.Linear(36864, 8192)
+        self.fc2 = nn.Linear(8192, 4096)
+        self.fc3 = nn.Linear(4096, 10)
 
-    self.maxPool = nn.MaxPool2d(2)
+    def forward(self, x):
+        # i = 0
+        # f = lambda i: [i+1,print(i,x.shape)][0]
 
-    self.drop1 = nn.Dropout(0.3)
-    self.drop2 = nn.Dropout(0.4)
-    self.drop3 = nn.Dropout(0.5)
-    self.drop4 = nn.Dropout(0.6)
-    self.drop4 = nn.Dropout(0.7)
+        x = nn.functional.rrelu(self.conv1(x))
+        x = nn.functional.rrelu(self.conv2(x))
+        x = self.maxPool(x)
 
-    self.fc1 = nn.Linear(36864, 8192)
-    self.fc2 = nn.Linear(8192, 8192)
-    self.fc3 = nn.Linear(8192, 10)
+        skip = x.clone()
 
-  def forward(self, x):
-    #i = 0
-    #f = lambda i: [i+1,print(i,x.shape)][0]
+        x = nn.functional.rrelu(self.conv3(x))
+        x = x + skip
+        x = self.drop1(x)
+        x = nn.functional.rrelu(self.conv4(x))
+        x = self.maxPool(x)
 
-    x = nn.functional.rrelu(self.conv1(x))
-    x = nn.functional.rrelu(self.conv2(x))
-    x = self.drop1(x)
+        skip = x.clone()
 
-    x = self.maxPool(x)
-    skip = x.clone()
+        x = nn.functional.rrelu(self.conv5(x))
+        x = x + skip
+        x = self.drop1(x)
+        x = nn.functional.rrelu(self.conv6(x))
+        x = self.maxPool(x)
 
-    x = nn.functional.rrelu(self.conv3(x))
-    x = self.drop2(x)
-
-    x = x + skip
-
-    x = nn.functional.rrelu(self.conv4(x))
-    x = self.maxPool(x)
-    x = self.drop3(x)
-
-    skip = x.clone()
-
-    x = nn.functional.rrelu(self.conv5(x))
-    x = x + skip
-    x = self.drop4(x)
-    x = nn.functional.rrelu(self.conv6(x))
-    x = self.maxPool(x)
-
-    x = x.reshape(x.shape[0], -1)
-    #i=f(i)
-
-    x = nn.functional.rrelu(self.fc1(x))
-
-    x = nn.functional.rrelu(self.fc2(x))
-    x = self.fc3(x)
-    #i=f(i)
-    return x
+        x = x.reshape(x.shape[0], -1)
+        # i=f(i)
+        x = nn.functional.rrelu(self.fc1(x))
+        x = nn.functional.rrelu(self.fc2(x))
+        x = self.fc3(x)
+        # i=f(i)
+        return x
 
 
 if __name__ == "__main__":

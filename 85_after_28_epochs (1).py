@@ -86,7 +86,7 @@ if __name__ == "__main__":
         print()
 
 
-    epochs = 40
+    epochs = 400
     batch_size = 16
     learning_rate = 0.0003
 

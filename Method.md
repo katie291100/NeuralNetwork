@@ -2,7 +2,7 @@ Here we outline the architecture of the Convolutional Neural Network we designed
 
 RELU EQUATION
 
- Cross entropy loss is applied to the output of the network after each batch, this is equivalent to applying softmax followed by the negative log likelihood loss function which is used by the optimiser to train the network. This was chosen because it is a standard loss function and its use greatly improves performance of models with softmax outputs [1]. 
+ Cross entropy loss is applied to the output of the network after each batch, this is equivalent to applying softmax followed by the negative log likelihood loss function which is used by the optimiser to train the network. This was chosen because it is a standard loss function and its use greatly improves performance of models with softmax outputs [1].   
  
 Cross Entropy Loss Function 
 

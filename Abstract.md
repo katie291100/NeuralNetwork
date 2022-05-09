@@ -1,0 +1,1 @@
+This paper presents our solution for the problem of image classification. We have developed a convolutional neural network consisting of seven convolutional layers and three fully connected layers which we have trained for X hours on the CIFAR-10 training data set. On the CIFAR-10 test set, our neural network has achieved a classification error rate of 10% after X epochs.

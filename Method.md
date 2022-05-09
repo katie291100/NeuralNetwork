@@ -9,3 +9,7 @@ Cross Entropy Loss Function
 To increase the generalisation of the network and to again reduce overfitting, image preprocessing is used for the testing data. A random affine is applied to the test set which randomly applies a horizontal and vertical shift by upto ± 10%  and sets the blank space to a default value of 0. The images are also randomly flipped horizontally. The images are also normalised to the values of the mean and standard deviation of the CIFAR10 dataset, which are [0.4914, 0.4822, 0.4465] and [0.2470, 0.2435, 0.2616] respectively. 
 
 The optimiser the network uses is the Adam optimiser which is a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement [2] which was important considering our hardware constraints. Adam optimiser implements a weight decay of which is set to 0.0015 which prevents the weights from increasing infinitely and helps to reduce overfitting. The learning rate for the optimiser is **XXXX**, this was chosen due to a range of experiments and was increased from 0.00015 due to the optimiser appearing to get stuck in a local minima. The batch size has been set to **XXX** which is due to the trade off between speed and accuracy **EXPLAIN MORE**. 
+
+
+[1] Goodfellow, I., Courville, A., Bengio, Y. (2016). Deep Learning. United Kingdom: MIT Press.
+[2] https://arxiv.org/pdf/1412.6980.pdf Adam optimiser
